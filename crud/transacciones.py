@@ -5,9 +5,9 @@ from models.transacciones import Transaccion, TipoTransaccion, MetodoPago, Estat
 from schemas.transacciones import TransaccionCreate, TransaccionUpdate
 from fastapi import HTTPException, status
 from typing import List, Optional
-from models.rolesModels import Rol  # Importa el modelo Rol
-from models.usuarioRolesModels import UsuarioRol  # Importa el modelo UsuarioRol
-from models.usersModels import Usuario
+from models.rols import Rol  # Importa el modelo Rol
+from models.usersrols import UsuarioRol  # Importa el modelo UsuarioRol
+from models.users import Usuario
 
 def obtener_usuarios_por_transaccion(db: Session, tipo_transaccion: str, rol: str):
     resultados = (

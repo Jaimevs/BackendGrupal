@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-import models.sucursalesModels
+import models.sucursales
 from config.db import get_db
-from schemas.sucursalSchemas import SucursalCreate, SucursalUpdate
-from schemas.sucursalSchemas import Sucursal as SucursalResponse
-from schemas.sucursalSchemas import SucursalResponseGerente
-import crud.sucursalesCrud as crud
+from schemas.sucursales import SucursalCreate, SucursalUpdate
+from schemas.sucursales import Sucursal as SucursalResponse
+from schemas.sucursales import SucursalResponseGerente
+import crud.sucursales as crud
 
 sucursal = APIRouter(prefix="/sucursales", tags=["Sucursales"])
 
