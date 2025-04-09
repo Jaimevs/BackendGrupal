@@ -4,7 +4,7 @@ from datetime import datetime
 import models.sucursales
 from schemas.sucursales import SucursalCreate, SucursalUpdate, Sucursal, SucursalResponseGerente  
 from models.sucursales import Sucursal
-from models.usuarioRolesModels import UsuarioRol
+from models.usersrols import UsuarioRol
 
 def get_sucursales(db: Session, skip: int = 0, limit: int = 10) -> List[SucursalResponseGerente]:
     sucursales = (

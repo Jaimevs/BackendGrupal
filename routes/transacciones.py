@@ -4,16 +4,16 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from datetime import datetime
 from typing import Optional, List
-from crud.transaccionsCrud import obtener_usuarios_por_transaccion  # en lugar de obtener_usuarios_por_rol
+from crud.transacciones import obtener_usuarios_por_transaccion  # en lugar de obtener_usuarios_por_rol
 from config.db import get_db
 from fastapi import WebSocket
 from asyncio import create_task
-from models.transaccionsModels import Transaccion
-from models.usuarioRolesModels import UsuarioRol
+from models.transacciones import Transaccion
+from models.usersrols import UsuarioRol
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import joinedload
 from webSocket.websocket import manager
-from schemas.transaccionSchemas import (
+from schemas.transacciones import (
     TransaccionCreate,
     TransaccionUpdate,
     TransaccionResponse,
@@ -22,8 +22,8 @@ from schemas.transaccionSchemas import (
     EstatusTransaccion,
     TransaccionEstadisticas
 )
-from config.jwt import get_current_user
-from crud.transaccionsCrud import (
+from config.db import get_current_user
+from crud.transacciones import (
     crear_transaccion,
     obtener_transaccion,
     obtener_todas_transacciones,
