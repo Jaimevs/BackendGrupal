@@ -9,6 +9,10 @@ from routes.promociones import promocion_router
 from routes.opinion_cliente import opinion_cliente_router
 from routes.membresias import membresia
 from routes.servicios_clientes import servicio_cliente
+from routes.productos import producto
+from routes.equipamiento import equipamiento
+from routes.mantenimiento import mantenimiento
+from routes.instalaciones import instalacion
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -31,3 +35,8 @@ app.include_router(promocion_router)
 app.include_router(opinion_cliente_router)
 app.include_router(membresia)
 app.include_router(servicio_cliente)
+app.include_router(instalacion)
+app.include_router(producto)
+app.include_router(equipamiento)
+app.include_router(mantenimiento)
+app.include_router(equipamiento)
