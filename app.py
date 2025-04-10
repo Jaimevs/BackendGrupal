@@ -4,6 +4,7 @@ from routes.person import person
 from routes.rol import rol
 from routes.user import user
 from routes.usersrols import userrol
+from routes.servicios import servicios_router
 from routes.evaluacion_serv import evaluaciones_serv_router
 from routes.promociones import promocion_router
 from routes.opinion_cliente import opinion_cliente_router
@@ -39,4 +40,5 @@ app.include_router(instalacion)
 app.include_router(producto)
 app.include_router(equipamiento)
 app.include_router(mantenimiento)
+app.include_router(servicios_router)
 app.include_router(equipamiento)
