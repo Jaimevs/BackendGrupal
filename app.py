@@ -4,6 +4,7 @@ from routes.person import person
 from routes.rol import rol
 from routes.user import user
 from routes.usersrols import userrol
+from routes.servicios import servicios_router
 from routes.evaluacion_serv import evaluaciones_serv_router
 from routes.promociones import promocion_router
 from routes.opinion_cliente import opinion_cliente_router
@@ -13,7 +14,15 @@ from routes.productos import producto
 from routes.equipamiento import equipamiento
 from routes.mantenimiento import mantenimiento
 from routes.instalaciones import instalacion
+from routes.expediente_medicoRoutes import router as expediente_router
+from routes.dietas import router as dietas_router
+from routes.ejercicios import router as ejercicios_router
+from routes.indicadores_nutricionales import router as indicadores_router
+from routes.objetivo_programa import router as objetivos_router
+from routes.programas_saludables import router as programas_router
+from routes.rutinas import router as rutinas_router
 from fastapi.middleware.cors import CORSMiddleware
+
 
 
 app = FastAPI()
@@ -39,4 +48,12 @@ app.include_router(instalacion)
 app.include_router(producto)
 app.include_router(equipamiento)
 app.include_router(mantenimiento)
+app.include_router(servicios_router)
 app.include_router(equipamiento)
+app.include_router(expediente_router)
+app.include_router(dietas_router)
+app.include_router(ejercicios_router)
+app.include_router(indicadores_router)
+app.include_router(objetivos_router)
+app.include_router(programas_router)
+app.include_router(rutinas_router)
