@@ -23,6 +23,10 @@ from routes.programas_saludables import router as programas_router
 from routes.rutinas import router as rutinas_router
 from fastapi.middleware.cors import CORSMiddleware
 
+from routes.areas import area  # Ruta para áreas
+from routes.horarios import horario # Ruta para horarios
+from routes.quejas_sugerencias import quejasrouter  # Ruta para quejas y sugerencias
+from routes.colaborador import colaborador
 
 
 app = FastAPI()
@@ -44,6 +48,10 @@ app.include_router(promocion_router)
 app.include_router(opinion_cliente_router)
 app.include_router(membresia)
 app.include_router(servicio_cliente)
+app.include_router(area)  # Se incluye la nueva ruta para áreas
+app.include_router(horario)  # Se incluye la nueva ruta para horarios
+app.include_router(quejasrouter)  # Se incluye la nueva ruta para quejas y sugerencias
+app.include_router(colaborador)  # Se incluye la nueva ruta para colaboradores
 app.include_router(instalacion)
 app.include_router(producto)
 app.include_router(equipamiento)

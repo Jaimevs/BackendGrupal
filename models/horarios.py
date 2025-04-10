@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, Enum, Time, DateTime, SmallInteger, ForeignKey
-from database import Base
+from config.db import Base
 
 import enum
 
