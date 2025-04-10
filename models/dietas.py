@@ -1,15 +1,33 @@
 from sqlalchemy import Boolean, Column, Enum, Float, Integer, Text, DateTime, String
 import datetime
 from config.db import Base
+import enum
+
+class ObjetivoDieta(enum.Enum):
+    Perdida_de_Peso = "Perdida de Peso"
+    Aumento_de_Masa_Muscular = "Aumento de masa muscular"
+    Mantenimiento = "Mantenimiento"
+
+class TipoEjercicioRecomendado(enum.Enum):
+    Cardio = "Cardio"
+    Levantamiento_de_Pesas = "Levantamiento de pesas"
+    Ejercicios_Tecnicos = "Ejercicios Tecnicos"
+
+class DiasEjercicio(enum.Enum):
+    Un_Dia = "1 dia a la semana"
+    Dos_Dias = "2 dias a la semana"
+    Tres_Dias = "3 dias a la semana"
+    Cuatro_Dias = "4 dias a la semana"
+    Cinco_Dias = "5 dias a la semana"
 
 class Dieta(Base):
     __tablename__ = "tbc_dietas"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(55), nullable=False)
-    objetivo = Column(Enum('Perdida de Peso', 'Aumento de masa muscular', 'Mantenimiento'), nullable=False)
-    tipo_ejercicios_recomendados = Column(Enum('Cardio', 'Levantamiento de pesas', 'Ejercicios Tecnicos'), nullable=False)
-    dias_ejercicio = Column(Enum('1 dia a la semana', '2 dias a la semana', '3 dias a la semana', '4 dias a la semana', '5 dias a la semana'), nullable=False)
+    objetivo = Column(Enum(ObjetivoDieta), nullable=False)
+    tipo_ejercicios_recomendados = Column(Enum(TipoEjercicioRecomendado), nullable=False)
+    dias_ejercicio = Column(Enum(DiasEjercicio), nullable=False)
     calorias_diarias = Column(Float, nullable=False)
     observaciones = Column(Text, nullable=True)
     estatus = Column(Boolean, default=True, nullable=False)

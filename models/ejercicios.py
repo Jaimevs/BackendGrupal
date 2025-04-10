@@ -25,11 +25,11 @@ class Ejercicio(Base):
     video = Column(String(255))
     tipo = Column(Enum(TipoEjercicio), nullable=False)
     estatus = Column(Boolean, nullable=False, default=True)
-    dificultad = Column(Enum(DificultadEjercicio), nullable=False) # valor numerico para que desde el front, se mida la dificultad
+    dificultad = Column(Enum(DificultadEjercicio), nullable=False)
     fecha_registro = Column(DateTime, default=datetime.utcnow)
     fecha_actualizacion = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    recomendaciones = Column(String(255)) # Por ejemplo: Tener la espalda recta.
-    restricciones = Column(String(255))# No apto para personas con problemas cardi
+    recomendaciones = Column(String(255))
+    restricciones = Column(String(255))
     
     # Nueva relación para rutinas
-    rutinas = relationship("Rutina", back_populates="ejercicio")
+ejercicio = relationship("Ejercicio", back_populates="rutinas")

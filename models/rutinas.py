@@ -7,7 +7,7 @@ class Rutina(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nombre = Column(String(255), nullable=False)
-    user_id = Column(Integer, ForeignKey("tbb_usuarios.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("tbb_usuarios.ID"), nullable=False)
     ejercicio_id = Column(Integer, ForeignKey("tbc_ejercicios.id"), nullable=False)
     objetivo_id = Column(Integer, ForeignKey("tbc_objetivo_programa.id"), nullable=True)
     descripcion = Column(String(500), nullable=True)
@@ -19,8 +19,6 @@ class Rutina(Base):
     fecha_actualizacion = Column(DateTime, nullable=True) 
     
 # Opcionalmente, puedes definir relaciones para facilitar el acceso a los objetos relacionados:
-    usuario = relationship("Usuario", back_populates="rutinas")
     ejercicio = relationship("Ejercicio", back_populates="rutinas")
-    objetivo = relationship("ObjetivoPrograma", back_populates="rutinas")
     
     

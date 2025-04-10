@@ -21,9 +21,13 @@ from routes.indicadores_nutricionales import router as indicadores_router
 from routes.objetivo_programa import router as objetivos_router
 from routes.programas_saludables import router as programas_router
 from routes.rutinas import router as rutinas_router
+from models import dietas, ejercicios, indicadores_nutricionales, rutinas, users, rols
+from config.db import Base, engine
+from models import dietas, ejercicios, indicadores_nutricionales, rutinas, users, rols, objetivo_programa, programas_saludables
 from fastapi.middleware.cors import CORSMiddleware
 
-
+# Crear todas las tablas en la base de datos
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.add_middleware(
@@ -35,6 +39,7 @@ app.add_middleware(
 )
 
 # TABLAS CON RELACIÓN 
+
 app.include_router(user)
 app.include_router(person)
 app.include_router(rol)
