@@ -9,7 +9,7 @@ from config.db import get_db
 from fastapi import WebSocket
 from asyncio import create_task
 from models.transacciones import Transaccion
-from models.usersrols import UsuarioRol
+from models.usersrols import UserRol
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import joinedload
 from websocket.websocket import manager
@@ -123,8 +123,8 @@ async def registrar_transaccion(
 
         # Obtener la transacción con sus datos asociados (usuario y rol)
         transaccion_con_datos = db.query(Transaccion).options(
-        joinedload(Transaccion.usuario_rol).joinedload(UsuarioRol.usuario),
-        joinedload(Transaccion.usuario_rol).joinedload(UsuarioRol.rol)
+        joinedload(Transaccion.usuario_rol).joinedload(UserRol.usuario),
+        joinedload(Transaccion.usuario_rol).joinedload(UserRol.rol)
         ).filter(Transaccion.id == nueva_transaccion.id).one_or_none()
 
         # Si no se encuentra la transacción, lanzar un error
