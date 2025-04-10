@@ -1,88 +1,118 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from models.colaboradores import Colaborador
-from schemas.colaborador import ColaboradorCreate, ColaboradorResponse, ColaboradorUpdate
-from crud.colaborador import crear_colaborador, All_colaboradores, update_colaborador, delete_colaborador,get_colaborador_by_id
-from database import get_db  # Asegúrate de importar get_db
-from datetime import timedelta
-from config.jwt import obtener_usuario_actual, ACCESS_TOKEN_EXPIRE_MINUTES  # Importa desde config/jwt.py
+import config.db
+import schemas.colaborador
+import crud.colaborador
+from models.colaboradores import Colaborador, Base
+from portadortoken import Portador
 
-router = APIRouter()
+# Crear el router y las tablas asociadas a Colaborador
+colaborador = APIRouter()
+Base.metadata.create_all(bind=config.db.engine)
 
-#ruta para registrar un nuevo colaborador
-@router.post("/colaborador/", response_model=ColaboradorResponse)
+def get_db():
+    db = config.db.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Ruta para registrar un nuevo colaborador
+@colaborador.post(
+    "/colaborador/",
+    response_model=schemas.colaborador.ColaboradorResponse,
+    tags=["Colaboradores"],
+    dependencies=[Depends(Portador())]
+)
 def registrar_colaborador(
-    colaborador: ColaboradorCreate, 
-    db: Session = Depends(get_db), 
-    usuario_actual: Colaborador = Depends(obtener_usuario_actual)
+    colaborador: schemas.colaborador.ColaboradorCreate,
+    db: Session = Depends(get_db)
 ):
     """
-    Endpoint para registrar un nuevo colaborador."
+    Endpoint para registrar un nuevo colaborador.
+    Requiere autenticación JWT.
     """
-    # Llamar a la función de la capa CRUD
-    db_colaborador = crear_colaborador(db, colaborador)
+    db_colaborador = crud.colaborador.crear_colaborador(db, colaborador)
     if not db_colaborador:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El correo electrónico ya está registrado",
+            detail="El correo electrónico ya está registrado"
         )
     return db_colaborador
 
-#ruta para obtener todos los colaboradores
-@router.get("/colaborador/", response_model=list[ColaboradorResponse])
+# Ruta para obtener todos los colaboradores
+@colaborador.get(
+    "/colaborador/",
+    response_model=list[schemas.colaborador.ColaboradorResponse],
+    tags=["Colaboradores"],
+    dependencies=[Depends(Portador())]
+)
 def obtener_colaboradores(
-    db: Session = Depends(get_db), 
-    usuario_actual: Colaborador = Depends(obtener_usuario_actual)
+    db: Session = Depends(get_db)
 ):
     """
     Endpoint para obtener todos los colaboradores.
+    Requiere autenticación JWT.
     """
-    # Llamar a la función de la capa CRUD
-    colaboradores = All_colaboradores(db)
-    return colaboradores
+    return crud.colaborador.All_colaboradores(db)
 
-#ruta para actualizar un colaborador por ID
-@router.put("/colaborador/{colaborador_id}", response_model=ColaboradorResponse)
+# Ruta para actualizar un colaborador por ID
+@colaborador.put(
+    "/colaborador/{colaborador_id}",
+    response_model=schemas.colaborador.ColaboradorResponse,
+    tags=["Colaboradores"],
+    dependencies=[Depends(Portador())]
+)
 def actualizar_colaborador(
     colaborador_id: int,
-    colaborador_data: ColaboradorUpdate,
-    db: Session = Depends(get_db),
-    usuario_actual: Colaborador = Depends(obtener_usuario_actual)
+    colaborador_data: schemas.colaborador.ColaboradorUpdate,
+    db: Session = Depends(get_db)
 ):
     """
     Endpoint para actualizar un colaborador existente.
+    Requiere autenticación JWT.
     """
-    # Llamar a la función de la capa CRUD
-    colaborador_actualizado = update_colaborador(db, colaborador_id, colaborador_data)
+    colaborador_actualizado = crud.colaborador.update_colaborador(db, colaborador_id, colaborador_data)
+    if not colaborador_actualizado:
+        raise HTTPException(status_code=404, detail="Colaborador no encontrado")
     return colaborador_actualizado
 
-#ruta para eliminar un colaborador
-@router.delete("/colaborador/{colaborador_id}", response_model=ColaboradorResponse)
+# Ruta para eliminar un colaborador
+@colaborador.delete(
+    "/colaborador/{colaborador_id}",
+    response_model=schemas.colaborador.ColaboradorResponse,
+    tags=["Colaboradores"],
+    dependencies=[Depends(Portador())]
+)
 def eliminar_colaborador(
     colaborador_id: int,
-    db: Session = Depends(get_db),
-    usuario_actual: Colaborador = Depends(obtener_usuario_actual)
+    db: Session = Depends(get_db)
 ):
     """
     Endpoint para eliminar un colaborador por su ID.
+    Requiere autenticación JWT.
     """
-    # Llamar a la función de la capa CRUD
-    colaborador_eliminado = delete_colaborador(db, colaborador_id)
+    colaborador_eliminado = crud.colaborador.delete_colaborador(db, colaborador_id)
+    if not colaborador_eliminado:
+        raise HTTPException(status_code=404, detail="Colaborador no encontrado")
     return colaborador_eliminado
 
-
-#ruta protegida para obtener un colaborador por ID
-@router.get("/colaborador/{colaborador_id}", response_model=ColaboradorResponse)
+# Ruta para obtener un colaborador por ID
+@colaborador.get(
+    "/colaborador/{colaborador_id}",
+    response_model=schemas.colaborador.ColaboradorResponse,
+    tags=["Colaboradores"],
+    dependencies=[Depends(Portador())]
+)
 def obtener_colaborador_por_id(
     colaborador_id: int,
-    db: Session = Depends(get_db),
-    usuario_actual: Colaborador = Depends(obtener_usuario_actual)
+    db: Session = Depends(get_db)
 ):
     """
     Endpoint para obtener un colaborador por su ID.
+    Requiere autenticación JWT.
     """
-    # Llamar a la función de la capa CRUD
-    colaborador = get_colaborador_by_id(db, colaborador_id)
+    colaborador = crud.colaborador.get_colaborador_by_id(db, colaborador_id)
     if not colaborador:
         raise HTTPException(status_code=404, detail="Colaborador no encontrado")
     return colaborador

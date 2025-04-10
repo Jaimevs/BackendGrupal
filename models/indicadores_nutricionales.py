@@ -1,10 +1,9 @@
-# models/indicadores_nutricionales.py
 from sqlalchemy import Column, Integer, Float, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
 from sqlalchemy.sql import func
-from config.db import Base  # Asegúrate de que tu objeto Base esté correctamente importado
+from config.db import Base
 
 class NivelActividad(enum.Enum):
     Sedentario = "Sedentario"
@@ -14,6 +13,7 @@ class NivelActividad(enum.Enum):
     Muy_Activo = "Muy_Activo"
 
 class IndicadorNutricional(Base):
+    __tablename__ = "tbd_indicadores_nutricionales"
     __tablename__ = "tbd_indicadores_nutricionales"
     
     id = Column(Integer, primary_key=True, autoincrement=True)

@@ -97,3 +97,6 @@ def get_user_by_email_password(db: Session, email: str, password: str):
     if user and verify_password(password, user.Contrasena):
         return user
     return None
+
+def get_user_by_nombre_usuario(db, nombre_usuario: str):
+    return get_user_by_usuario(db, nombre_usuario)

@@ -1,15 +1,16 @@
 from typing import Optional, List
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
-import models.sucursales
-from schemas.sucursales import SucursalCreate, SucursalUpdate, Sucursal, SucursalResponseGerente  
 from models.sucursales import Sucursal
-from models.usersrols import UsuarioRol
+from schemas.sucursales import SucursalCreate, SucursalUpdate, Sucursal as SucursalSchema, SucursalResponseGerente
+
+# Importamos la clase con el nombre correcto
+from models.usersrols import UserRol  # Cambiado de UsuarioRol a UserRol
 
 def get_sucursales(db: Session, skip: int = 0, limit: int = 10) -> List[SucursalResponseGerente]:
     sucursales = (
         db.query(Sucursal)
-        .options(joinedload(Sucursal.responsable).joinedload(UsuarioRol.usuario))
+        .options(joinedload(Sucursal.responsable).joinedload(UserRol.usuario))  # Cambiado aquí
         .filter(Sucursal.Estatus == "Activa")  
         .offset(skip)
         .limit(limit)
@@ -19,7 +20,7 @@ def get_sucursales(db: Session, skip: int = 0, limit: int = 10) -> List[Sucursal
     result = []
     for sucursal in sucursales:
         responsable_nombre = (
-            sucursal.responsable.usuario.nombre_usuario
+            sucursal.responsable.usuario.Nombre_Usuario  # Asumiendo que este es el campo correcto
             if sucursal.responsable and sucursal.responsable.usuario else None
         )
         result.append(SucursalResponseGerente(
@@ -40,11 +41,11 @@ def get_sucursales(db: Session, skip: int = 0, limit: int = 10) -> List[Sucursal
     
 # Obtener una sucursal por ID
 def get_sucursal(db: Session, id: int):
-    return db.query(models.sucursalesModels.Sucursal).filter(models.sucursalesModels.Sucursal.id == id).first()
+    return db.query(Sucursal).filter(Sucursal.id == id).first()
 
 # Crear una nueva sucursal
 def create_sucursal(db: Session, sucursal: SucursalCreate):
-    db_sucursal = models.sucursalesModels.Sucursal(
+    db_sucursal = Sucursal(
         Nombre=sucursal.Nombre,
         Direccion=sucursal.Direccion,
         Telefono=sucursal.Telefono,
@@ -60,7 +61,7 @@ def create_sucursal(db: Session, sucursal: SucursalCreate):
 
 # Actualizar una sucursal existente
 def update_sucursal(db: Session, id: int, sucursal_data: SucursalUpdate):
-    db_sucursal = db.query(models.sucursalesModels.Sucursal).filter(models.sucursalesModels.Sucursal.id == id).first()
+    db_sucursal = db.query(Sucursal).filter(Sucursal.id == id).first()
     if db_sucursal is None:
         return None
 
@@ -79,7 +80,7 @@ def update_sucursal(db: Session, id: int, sucursal_data: SucursalUpdate):
 
 # "Eliminar" una sucursal (cambio de Estatus a Inactiva)
 def delete_sucursal(db: Session, id: int):
-    db_sucursal = db.query(models.sucursalesModels.Sucursal).filter(models.sucursalesModels.Sucursal.id == id).first()
+    db_sucursal = db.query(Sucursal).filter(Sucursal.id == id).first()
     if db_sucursal is None:
         return None
 

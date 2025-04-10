@@ -1,86 +1,92 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from schemas.horarios import TbbHorariosCreate, TbbHorarios
-from models.usuarios import Usuario  # Tu modelo para usuarios
-from crud.horarios import create_horario,All_horarios,update_horario,delete_horario,get_horario_by_id  # La función que creaste para insertar horarios
-from config.jwt import obtener_usuario_actual  # Dependencia que verifica al usuario autenticado
-from database import get_db
+import crud.horarios
+import config.db
+import schemas.horarios
+from portadortoken import Portador
+from models.horarios import TbbHorarios, Base  # Se asume que el modelo TbbHorarios y su Base existen en models.horarios
 
-router = APIRouter()
+horario = APIRouter()
+Base.metadata.create_all(bind=config.db.engine)
+def get_db():
+    db = config.db.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-# Ruta protegida que requiere autenticación
-@router.post("/horarios/", response_model=TbbHorariosCreate)
+# Ruta protegida que requiere autenticación JWT mediante Portador
+@horario.post("/horarios/", response_model=schemas.horarios.TbbHorariosCreate,tags=["Horarios"], dependencies=[Depends(Portador())])
 def crear_horario(
-    horario: TbbHorariosCreate, 
+    horario: schemas.horarios.TbbHorariosCreate, 
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obtener_usuario_actual)  # Verifica que el usuario esté autenticado
+    usuario: dict = Depends(Portador())  # Obtiene el usuario autenticado
 ):
     """
     Endpoint para crear un nuevo horario en la base de datos.
-    Requiere autenticación.
+    Requiere autenticación JWT.
     """
-    # Crear un nuevo horario usando la función que hemos definido
     try:
-        return create_horario(db=db, horario=horario)
+        return crud.horarios.create_horario(db=db, horario=horario)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/horarios/")
+@horario.get("/horarios/",tags=["Horarios"], dependencies=[Depends(Portador())])
 def obtener_horarios(
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obtener_usuario_actual)  # Verifica que el usuario esté autenticado
+    usuario: dict = Depends(Portador())  # Verifica que el usuario esté autenticado
 ):
     """
     Endpoint protegido para obtener todos los horarios de la base de datos.
-    Requiere autenticación.
+    Requiere autenticación JWT.
     """
     try:
-        return All_horarios(db=db)
+        return crud.horarios.All_horarios(db=db)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.put("/horarios/{horario_id}", response_model=TbbHorariosCreate)
+@horario.put("/horarios/{horario_id}", response_model=schemas.horarios.TbbHorariosCreate,tags=["Horarios"], dependencies=[Depends(Portador())])
 def actualizar_horario(
     horario_id: int,
-    horario_data: TbbHorariosCreate,
+    horario_data: schemas.horarios.TbbHorariosCreate,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obtener_usuario_actual)  # Verifica que el usuario esté autenticado
+    usuario: dict = Depends(Portador())  # Verifica que el usuario esté autenticado
 ):
     """
     Endpoint protegido para actualizar un horario existente.
-    Requiere autenticación.
+    Requiere autenticación JWT.
     """
     try:
-        return update_horario(db=db, horario_id=horario_id, horario_data=horario_data)
+        return crud.horarios.update_horario(db=db, horario_id=horario_id, horario_data=horario_data)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
-@router.delete("/horarios/{horario_id}")
+@horario.delete("/horarios/{horario_id}",tags=["Horarios"], dependencies=[Depends(Portador())])
 def eliminar_horario(
     horario_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obtener_usuario_actual)  # Verifica que el usuario esté autenticado
+    usuario: dict = Depends(Portador())  # Verifica que el usuario esté autenticado
 ):
     """
     Endpoint protegido para eliminar un horario existente.
-    Requiere autenticación.
+    Requiere autenticación JWT.
     """
     try:
-        return delete_horario(db=db, horario_id=horario_id)
+        return crud.horarios.delete_horario(db=db, horario_id=horario_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
-@router.get("/horarios/{horario_id}", response_model=TbbHorariosCreate)
+@horario.get("/horarios/{horario_id}", response_model=schemas.horarios.TbbHorariosCreate,tags=["Horarios"], dependencies=[Depends(Portador())])
 def obtener_horario_por_id(
     horario_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obtener_usuario_actual)  # Verifica que el usuario esté autenticado
+    usuario: dict = Depends(Portador())  # Verifica que el usuario esté autenticado
 ):
     """
     Endpoint protegido para obtener un horario por su ID.
-    Requiere autenticación.
+    Requiere autenticación JWT.
     """
-    horario = get_horario_by_id(db, horario_id)
+    horario = crud.horarios.get_horario_by_id(db, horario_id)
     if not horario:
         raise HTTPException(status_code=404, detail="Horario no encontrado")
     return horario

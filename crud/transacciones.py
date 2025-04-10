@@ -5,21 +5,21 @@ from models.transacciones import Transaccion, TipoTransaccion, MetodoPago, Estat
 from schemas.transacciones import TransaccionCreate, TransaccionUpdate
 from fastapi import HTTPException, status
 from typing import List, Optional
-from models.rols import Rol  # Importa el modelo Rol
-from models.usersrols import UsuarioRol  # Importa el modelo UsuarioRol
-from models.users import Usuario
+from models.rols import Rol  
+from models.usersrols import UserRol 
+from models.users import User as Usuario
 
 def obtener_usuarios_por_transaccion(db: Session, tipo_transaccion: str, rol: str):
     resultados = (
         db.query(
-            UsuarioRol.Usuario_ID.label("usuario_rol_id"),
-            Usuario.nombre_usuario,
-            Rol.Nombre.label("rol")
+            UserRol.Usuario_ID.label("usuario_rol_id"),
+            Usuario.Nombre_Usuario,
+            Rol.Nombre.label("rol") 
         )
-        .join(UsuarioRol, Usuario.id == UsuarioRol.Usuario_ID)
-        .join(Rol, UsuarioRol.Rol_ID == Rol.ID)
+        .join(UserRol, Usuario.ID == UserRol.Usuario_ID)
+        .join(Rol, UserRol.Rol_ID == Rol.ID)
         .filter(Rol.Nombre == rol)
-        .filter(UsuarioRol.Estatus == True)
+        .filter(UserRol.Estatus == True)
         .all()
     )
 
@@ -86,12 +86,12 @@ def obtener_todas_transacciones(
             Transaccion.usuario_id,
             Transaccion.fecha_registro,
             Transaccion.fecha_actualizacion,
-            Usuario.nombre_usuario.label("nombre_usuario"),
-            Usuario.estatus.label("estatus_usuario"),
+            Usuario.Nombre_Usuario.label("nombre_usuario"),
+            Usuario.Estatus.label("estatus_usuario"),
             Rol.Nombre.label("rol")  # Incluye el nombre del rol desde la tabla Rol
-        ).join(Usuario, Transaccion.usuario_id == Usuario.id
-        ).join(UsuarioRol, Usuario.id == UsuarioRol.Usuario_ID
-        ).join(Rol, UsuarioRol.Rol_ID == Rol.ID)  # Join con la tabla Rol
+        ).join(Usuario, Transaccion.usuario_id == Usuario.ID
+        ).join(UserRol, Usuario.ID == UserRol.Usuario_ID
+        ).join(Rol, UserRol.Rol_ID == Rol.ID)  # Join con la tabla Rol
 
         # Aplicar filtros
         if tipo_transaccion:

@@ -21,13 +21,15 @@ from routes.indicadores_nutricionales import router as indicadores_router
 from routes.objetivo_programa import router as objetivos_router
 from routes.programas_saludables import router as programas_router
 from routes.rutinas import router as rutinas_router
-from models import dietas, ejercicios, indicadores_nutricionales, rutinas, users, rols
-from config.db import Base, engine
-from models import dietas, ejercicios, indicadores_nutricionales, rutinas, users, rols, objetivo_programa, programas_saludables
+from routes.sucursales import sucursal
+from routes.transacciones import transaccion
 from fastapi.middleware.cors import CORSMiddleware
 
-# Crear todas las tablas en la base de datos
-Base.metadata.create_all(bind=engine)
+from routes.areas import area  # Ruta para áreas
+from routes.horarios import horario # Ruta para horarios
+from routes.quejas_sugerencias import quejasrouter  # Ruta para quejas y sugerencias
+from routes.colaborador import colaborador
+
 
 app = FastAPI()
 app.add_middleware(
@@ -49,11 +51,15 @@ app.include_router(promocion_router)
 app.include_router(opinion_cliente_router)
 app.include_router(membresia)
 app.include_router(servicio_cliente)
+app.include_router(servicios_router)
+app.include_router(area)  # Se incluye la nueva ruta para áreas
+app.include_router(horario)  # Se incluye la nueva ruta para horarios
+app.include_router(quejasrouter)  # Se incluye la nueva ruta para quejas y sugerencias
+app.include_router(colaborador)  # Se incluye la nueva ruta para colaboradores
 app.include_router(instalacion)
 app.include_router(producto)
 app.include_router(equipamiento)
 app.include_router(mantenimiento)
-app.include_router(servicios_router)
 app.include_router(equipamiento)
 app.include_router(expediente_router)
 app.include_router(dietas_router)
@@ -62,3 +68,5 @@ app.include_router(indicadores_router)
 app.include_router(objetivos_router)
 app.include_router(programas_router)
 app.include_router(rutinas_router)
+app.include_router(sucursal)
+app.include_router(transaccion)

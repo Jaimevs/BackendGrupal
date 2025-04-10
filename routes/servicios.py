@@ -9,11 +9,13 @@ import schemas.servicios
 import models.users
 import models.usersrols
 import models.servicios
+import models.areas
 from datetime import datetime
 
 servicios_router = APIRouter()
 
 # Crear las tablas si no existen
+models.areas.Base.metadata.create_all(bind=engine)
 models.servicios.Base.metadata.create_all(bind=engine)
 
 # Ruta para obtener todos los servicios (accesible para todos)
