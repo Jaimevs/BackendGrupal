@@ -12,7 +12,9 @@ from models.transacciones import Transaccion
 from models.usersrols import UsuarioRol
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import joinedload
-from webSocket.websocket import manager
+from websocket.websocket import manager
+from fastapi.encoders import jsonable_encoder
+import json
 from schemas.transacciones import (
     TransaccionCreate,
     TransaccionUpdate,
@@ -22,7 +24,7 @@ from schemas.transacciones import (
     EstatusTransaccion,
     TransaccionEstadisticas
 )
-from config.db import get_current_user
+from config.jwt import get_current_user
 from crud.transacciones import (
     crear_transaccion,
     obtener_transaccion,
@@ -41,7 +43,6 @@ async def websocket_transacciones(websocket: WebSocket):
             await websocket.receive_text()  # Se mantiene la conexión abierta esperando datos
     except Exception:
         manager.disconnect(websocket)  # Si algo sale mal, desconectamos al cliente
-
 
 @transaccion.get("/transacciones/estadisticas", response_model=TransaccionEstadisticas, tags=["Transacciones"])
 def get_estadisticas_transacciones(
@@ -106,6 +107,7 @@ def obtener_usuarios_por_transaccion_route(
 
     return usuarios
 
+
 @transaccion.post("/register-tra/", response_model=TransaccionResponse, tags=["Transacciones"])
 async def registrar_transaccion(
     transaccion_data: TransaccionCreate, 
@@ -121,9 +123,8 @@ async def registrar_transaccion(
 
         # Obtener la transacción con sus datos asociados (usuario y rol)
         transaccion_con_datos = db.query(Transaccion).options(
-            joinedload(Transaccion.usuario_rol)  # Cargar la relación 'usuario_rol'
-            .joinedload(UsuarioRol.usuario)  # Cargar la relación 'usuario' de UsuarioRol
-            .joinedload(UsuarioRol.rol)     # Cargar la relación 'rol' de UsuarioRol
+        joinedload(Transaccion.usuario_rol).joinedload(UsuarioRol.usuario),
+        joinedload(Transaccion.usuario_rol).joinedload(UsuarioRol.rol)
         ).filter(Transaccion.id == nueva_transaccion.id).one_or_none()
 
         # Si no se encuentra la transacción, lanzar un error
@@ -132,14 +133,31 @@ async def registrar_transaccion(
 
         # Asignar 'nombre_usuario' y 'rol' de manera segura
         usuario_rol = transaccion_con_datos.usuario_rol
-        nombre_usuario = usuario_rol.usuario.nombre if usuario_rol and usuario_rol.usuario else None
-        rol = usuario_rol.rol.nombre if usuario_rol and usuario_rol.rol else None
+        nombre_usuario = usuario_rol.usuario.nombre_usuario if usuario_rol and usuario_rol.usuario else None
+        rol = usuario_rol.rol.Nombre if usuario_rol and usuario_rol.rol else None
 
-        # Convertir la transacción a un modelo Pydantic (TransaccionResponse)
-        transaccion_response = TransaccionResponse.from_orm(transaccion_con_datos)
-        transaccion_response.nombre_usuario = nombre_usuario
-        transaccion_response.rol = rol
+        # Crear el objeto TransaccionResponse directamente con los campos requeridos
+        transaccion_response = TransaccionResponse(
+            id=transaccion_con_datos.id,
+            detalles=transaccion_con_datos.detalles,
+            tipo_transaccion=transaccion_con_datos.tipo_transaccion,
+            metodo_pago=transaccion_con_datos.metodo_pago,
+            monto=transaccion_con_datos.monto,
+            estatus=transaccion_con_datos.estatus,
+            usuario_id=transaccion_con_datos.usuario_id,
+            fecha_registro=transaccion_con_datos.fecha_registro,
+            fecha_actualizacion=transaccion_con_datos.fecha_actualizacion,
+            nombre_usuario=nombre_usuario,
+            rol=rol
+        )
 
+        # Convertir el objeto en un dict y notificar a los clientes
+        transaccion_dict = transaccion_response.dict()
+        # Enviar una notificación a todos los clientes WebSocket conectados
+        await manager.broadcast(json.dumps({
+            "action": "new_transaction",
+            "data": jsonable_encoder(transaccion_response)
+            }))
         return transaccion_response
 
     except HTTPException as e:
@@ -152,8 +170,6 @@ async def registrar_transaccion(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al registrar transacción: {str(e)}"
         )
-
-
 
 @transaccion.get("/obtener-todo", response_model=List[TransaccionResponse], tags=["Transacciones"])
 def listar_todas_transacciones(

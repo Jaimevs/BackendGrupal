@@ -14,7 +14,7 @@ def obtener_usuarios_por_transaccion(db: Session, tipo_transaccion: str, rol: st
         db.query(
             UsuarioRol.Usuario_ID.label("usuario_rol_id"),
             Usuario.nombre_usuario,
-            Rol.Nombre.label("rol")
+            Rol.Nombre.label("rol") 
         )
         .join(UsuarioRol, Usuario.id == UsuarioRol.Usuario_ID)
         .join(Rol, UsuarioRol.Rol_ID == Rol.ID)
