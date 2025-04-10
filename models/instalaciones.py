@@ -8,7 +8,7 @@ class Instalacion(Base):
     __tablename__ = 'tbb_instalaciones'
     
     Id = Column(Integer, primary_key=True, index=True)
-    #Sucursal_Id = Column(Integer, ForeignKey('tbc_sucursales.Id'), nullable=False)
+    Sucursal_Id = Column(Integer, ForeignKey('tbc_sucursales.id'), nullable=False)
     Descripcion = Column(LONGTEXT)
     Tipo = Column(String(50))
     # Horario_Id = Column(Integer)  # Comentado según solicitud
