@@ -21,6 +21,8 @@ from routes.indicadores_nutricionales import router as indicadores_router
 from routes.objetivo_programa import router as objetivos_router
 from routes.programas_saludables import router as programas_router
 from routes.rutinas import router as rutinas_router
+from routes.sucursales import sucursal
+from routes.transacciones import transaccion
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -57,3 +59,5 @@ app.include_router(indicadores_router)
 app.include_router(objetivos_router)
 app.include_router(programas_router)
 app.include_router(rutinas_router)
+app.include_router(sucursal)
+app.include_router(transaccion)
