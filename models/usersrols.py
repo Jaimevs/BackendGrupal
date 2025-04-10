@@ -16,3 +16,6 @@ class UserRol(Base):
     # Relaciones
     usuario = relationship("User", foreign_keys=[Usuario_ID])
     rol = relationship("Rol", foreign_keys=[Rol_ID])
+
+    transacciones = relationship("Transaccion", back_populates="usuario_rol")
+    sucursal = relationship("Sucursal", back_populates="responsable", uselist=False)

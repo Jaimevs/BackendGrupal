@@ -28,3 +28,4 @@ class User(Base):
     # Relación con Person - un usuario solo puede tener una persona
     # La relación se define aquí pero la clave foránea está en Person
     persona = relationship("Person", uselist=False, back_populates="usuario")
+    indicadores_nutricionales = relationship("IndicadorNutricional", back_populates="usuario")
